@@ -82,7 +82,7 @@ class ToTensor(object):
         # torch image: C X H X W
         image = image.transpose((2, 0, 1))
         return {'image': torch.from_numpy(image),
-                'landmarks': label}
+                'label': label}
 
 
 def show_img_batch(sample_batched):

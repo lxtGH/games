@@ -6,7 +6,6 @@ Author: XiangtaiLi
 import torch
 import torch.utils.data as data
 from torchvision import transforms, utils
-from .utils import Rescale,RandomCrop,ToTensor
 import pandas as pd
 import os, math, random
 from skimage import io
@@ -42,10 +41,13 @@ class FashionAttributes(data.Dataset):
         """
         if self.mode == "train":
             img = io.imread(os.path.join(self.train_path,self.train_imgs[item]))
-            if self.transform:
-                img = self.transform(img)
             label = self.train_labels[item]
-            return {"image":img,"label":label}
+            sample = {"image":img,"label":label}
+
+            if self.transform:
+                sample = self.transform(sample)
+
+            return sample
         if self.mode =="test":
             img = io.imread(os.path.join(self.test_path,self.test_imgs[item]))
             if self.transform:
@@ -62,7 +64,6 @@ class FashionAttributes(data.Dataset):
 if __name__ == '__main__':
     path = "/home/lxt/data/alibaba"
     Ali_dataset = FashionAttributes(root=path)
-
     for i in range(len(Ali_dataset)):
         sample = Ali_dataset[i]
         if i > 10:

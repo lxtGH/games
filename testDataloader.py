@@ -13,11 +13,9 @@ if __name__ == '__main__':
                                             ToTensor()
                                         ]))
     dataloader = DataLoader(Ali_dataset,batch_size=20, shuffle=True, num_workers=4)
-
     for i_batch, sample_batched in enumerate(dataloader):
         print(i_batch, sample_batched['image'].size(),
               sample_batched['label'])
-
         # observe 4th batch and stop.
         if i_batch == 3:
             #plt.figure()
