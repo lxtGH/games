@@ -2,9 +2,11 @@ from data.utils import *
 from data.dataloader import FashionAttributes
 from model.baseline_model import baseline_model
 from torch.utils.data import Dataset, DataLoader
+from model.baseline_model import Loss_func
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+
 from torch.autograd import Variable
 
 
@@ -39,6 +41,7 @@ if __name__ == '__main__':
 
     base_model = baseline_model().cuda()
 
+
     print(base_model.modules())
     print(base_model)
 
@@ -55,20 +58,23 @@ if __name__ == '__main__':
         if i_batch == 3:
             img = sample_batched[0]['image']
             mask = sample_batched[1]
+            y = sample_batched[2]
             img = torch.FloatTensor(img.numpy())
+            mask = torch.FloatTensor(mask.numpy())
+            y = torch.FloatTensor(mask.numpy())
 
-            print(type(mask))
-
-            mask = torch.IntTensor(mask.numpy())
             img = Variable(img).cuda()
-
+            mask = Variable(mask).cuda()
+            y = Variable(y).cuda()
             #input = (img, mask)
-            #out = base_model.forward(input)
+            out = base_model.forward(img)
             #print(out[0].size())
             #print(out[1].size())
-            #print(out[2].size())
-            #print(out[3].size())
-            #print(out[1])
+            #print(out[5].size())
+            #print(y.size())
+            #print(mask.size())
+            loss = Loss_func(out,y,mask)
+            print(loss())
             break
 
     mask = torch.IntTensor(np.ones((4, 5, 6), dtype=int))

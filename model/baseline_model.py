@@ -76,23 +76,41 @@ class baseline_model(nn.Module):
         return Variable(f_mask).cuda()
 
 
-    def forward(self,input):
-        x, mask = input
+    def forward(self,x):
         x = self.se_model(x)
         output = []
         for i in range(8):
-            out = self.fc_list[i](mask[i, :, :] * x)
+            out = self.fc_list[i](x)
             output.append(out)
-
         return output
 
 
 class Loss_func(object):
-    def __init__(self, out,gt,loss_f=nn.CrossEntropyLoss()):
+    def __init__(self, out, gt,mask,loss_f=nn.CrossEntropyLoss()):
         self.out = out
+        self.mask = mask
         self.gt = gt
         self.loss_f = loss_f
         self.total = 0
-    def __call__(self, *args, **kwargs):
-        for i in self.out:
-            self.total += self.loss_f()
+    def __call__(self,):
+        batch = self.out[0].size()[0]
+        for i in range(len(self.out)):
+            #print(self.out[i].size())
+            dis = self.out[i].size()[1]
+            mask = self.mask[:,i].contiguous()
+            mask = mask.view(batch,-1).expand([-1,8])
+
+
+            #print(mask.size())
+            out = self.out[i] * mask
+            #print(self.gt)
+
+            #print(self.gt * mask)
+            y = self.gt * mask
+            print(out.size)
+            print(y[:,dis-1].size)
+            #print(y)
+            #self.total += self.loss_f(out, y[:,dis-1])
+            #self.total += abs(out - y[:,dis-1])
+        return self.total
+

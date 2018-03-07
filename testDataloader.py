@@ -19,8 +19,8 @@ if __name__ == '__main__':
                 sample_batched[1],
               sample_batched[0]['label'],sample_batched[2].size())
 
-        mask = sample_batched[1].size()
-        print(mask)
+        #mask = sample_batched[1].size()
+        #print(mask)
         # observe 4th batch and stop.
         if i_batch == 3:
             break

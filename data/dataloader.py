@@ -48,7 +48,6 @@ class FashionAttributes(data.Dataset):
             up_label, down_label = label
             mask = np.zeros(8)
             mask[mask_dic[up_label]] = 1
-
             y = down_label.index("y")
 
             return sample, mask, y
