@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 
 label_dic = {"y":1,"m":0.5,"n":0}
 
+mask_dic = {"coat_length_labels":0,"collar_design_labels":1,"lapel_design_labels":2,"neck_design_labels":3,
+            "neckline_design_labels":4,"pant_length_labels":5,"skirt_length_labels":6,"sleeve_length_labels":7
+            }
+
+class_num = [8,5,5,5,10,6,6,9]
+
 
 class Rescale(object):
     """Rescale the image in a sample to a given size.
@@ -21,7 +27,7 @@ class Rescale(object):
         self.output_size = output_size
 
     def __call__(self, sample):
-        image, landmarks = sample['image'], sample['label']
+        image, label = sample['image'], sample['label']
 
         h, w = image.shape[:2]
         if isinstance(self.output_size, int):
@@ -37,7 +43,7 @@ class Rescale(object):
         img = transform.resize(image, (new_h, new_w))
 
 
-        return {'image': img, 'label': landmarks}
+        return {'image': img, 'label': label}
 
 
 class RandomCrop(object):

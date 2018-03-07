@@ -2,7 +2,6 @@
 """
 Author: XiangtaiLi
 """
-
 import torch
 import torch.utils.data as data
 from torchvision import transforms, utils
@@ -11,8 +10,7 @@ import os, math, random
 from skimage import io
 from os.path import *
 import numpy as np
-
-
+from .utils import mask_dic
 
 class FashionAttributes(data.Dataset):
     """
@@ -47,7 +45,14 @@ class FashionAttributes(data.Dataset):
             if self.transform:
                 sample = self.transform(sample)
 
-            return sample
+            up_label, down_label = label
+            mask = np.zeros(8)
+            mask[mask_dic[up_label]] = 1
+
+            y = down_label.index("y")
+
+            return sample, mask, y
+
         if self.mode =="test":
             img = io.imread(os.path.join(self.test_path,self.test_imgs[item]))
             if self.transform:
@@ -60,7 +65,23 @@ class FashionAttributes(data.Dataset):
         if self.mode =="test":
             return len(self.test_data)
 
+    # unused
+    def make_mask(self,x):
+        """
+        :param x: images along with their up-labels (b,c,h,w)
+        :return: mask (8,b)
+        """
+        img, y = x
+        b,c,h,w = img.shape()
+        mask = np.zeros((8,b))
+        for i in y:
+            mask[mask_dic[y],i] = 1
+        return mask
 
+
+
+
+"""
 if __name__ == '__main__':
     path = "/home/lxt/data/alibaba"
     Ali_dataset = FashionAttributes(root=path)
@@ -69,6 +90,9 @@ if __name__ == '__main__':
         if i > 10:
             break
         print(sample["image"].shape)
+
+"""
+
 
 
 
