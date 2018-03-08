@@ -86,31 +86,37 @@ class baseline_model(nn.Module):
 
 
 class Loss_func(object):
-    def __init__(self, out, gt,mask,loss_f=nn.CrossEntropyLoss()):
+    def __init__(self, out, gt,mask,softmax,loss_f=nn.MSELoss()):
         self.out = out
         self.mask = mask
         self.gt = gt
         self.loss_f = loss_f
-        self.total = 0
+        self.total = []
+        self.softmax = softmax
+        self.output = []
+
     def __call__(self,):
         batch = self.out[0].size()[0]
+        output = Variable(torch.FloatTensor(np.zeros((batch,10)))).cuda()
         for i in range(len(self.out)):
-            #print(self.out[i].size())
+
             dis = self.out[i].size()[1]
-            mask = self.mask[:,i].contiguous()
-            mask = mask.view(batch,-1).expand([-1,8])
+            mask = self.mask[:,i].contiguous().squeeze()
+            mask = torch.nonzero(mask).squeeze() #get the index
+            #print("mask index",mask.size())
+            #print("out: ",self.out[i].size())
+            #mask = mask.view(batch,-1).expand([-1,dis]) # get the mask
+            #print(mask)
+            res = torch.index_select(self.out[i][:,:dis],0,mask)
+            print("resout: ",res.size())
+            res = self.softmax(res)
+            #print(res)
 
+            y = torch.index_select(self.gt[:,:dis],0,mask)
 
-            #print(mask.size())
-            out = self.out[i] * mask
-            #print(self.gt)
+            #exit()
+            self.total.append(self.loss_f(res,y))
+            self.output.append(res)
 
-            #print(self.gt * mask)
-            y = self.gt * mask
-            print(out.size)
-            print(y[:,dis-1].size)
-            #print(y)
-            #self.total += self.loss_f(out, y[:,dis-1])
-            #self.total += abs(out - y[:,dis-1])
-        return self.total
+        return self.total, self.output
 

@@ -15,7 +15,6 @@ class_num = [8,5,5,5,10,6,6,9]
 
 class Rescale(object):
     """Rescale the image in a sample to a given size.
-
     Args:
         output_size (tuple or int): Desired output size. If tuple, output is
             matched to output_size. If int, smaller of image edges is matched
@@ -41,7 +40,6 @@ class Rescale(object):
         new_h, new_w = int(new_h), int(new_w)
 
         img = transform.resize(image, (new_h, new_w))
-
 
         return {'image': img, 'label': label}
 
@@ -87,7 +85,7 @@ class ToTensor(object):
         # numpy image: H x W x C
         # torch image: C X H X W
         image = image.transpose((2, 0, 1))
-        return {'image': torch.from_numpy(image),
+        return {'image': torch.FloatTensor(image),
                 'label': label}
 
 

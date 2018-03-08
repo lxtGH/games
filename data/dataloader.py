@@ -45,12 +45,16 @@ class FashionAttributes(data.Dataset):
             if self.transform:
                 sample = self.transform(sample)
 
+            sample["image"] = torch.FloatTensor(sample["image"])
+
             up_label, down_label = label
             mask = np.zeros(8)
             mask[mask_dic[up_label]] = 1
-            y = down_label.index("y")
 
-            return sample, mask, y
+            y = np.zeros(10)
+            y[down_label.index("y")] = 1
+
+            return sample, torch.FloatTensor(mask), torch.FloatTensor(y)
 
         if self.mode =="test":
             img = io.imread(os.path.join(self.test_path,self.test_imgs[item]))
